@@ -8,45 +8,34 @@
 
 RingBufferWrapper::RingBufferWrapper(uint8_t* data, uint32_t len) noexcept
    : valid(false)
-{  
+{
+   _data.reset(data); // take ownership immediately
    if (!isMultipleTwo(len)) {
-      valid = false;
-      goto error;
+      return;
    }
-
-   valid = ringBufferInit(&buffer, data, len);
+   valid = ringBufferInit(&buffer, _data.get(), len);
    if (!valid) {
-      goto error;
+      _data.reset();
    }
-   return;
-
-error:
-   delete[] data;
-   buffer.data = NULL;
 }
 
 
 RingBufferWrapper::RingBufferWrapper(uint32_t size) noexcept
    : valid(false)
-{ 
+{
    if (!isMultipleTwo(size)) {
       return;
    }
-
-   uint8_t *data = new uint8_t[size];
-   valid = ringBufferInit(&buffer, data, size);
-
-   if (!valid) { 
-      delete[] data;
-      buffer.data = NULL;
+   _data = std::make_unique<uint8_t[]>(size);
+   valid = ringBufferInit(&buffer, _data.get(), size);
+   if (!valid) {
+      _data.reset();
    }
 }
 
 RingBufferWrapper::~RingBufferWrapper() noexcept
-{  
-   if (buffer.data != NULL) {
-      delete[] buffer.data;
-   }
+{
+   // _data unique_ptr frees the buffer automatically
 }
 
 bool RingBufferWrapper::isValid() noexcept

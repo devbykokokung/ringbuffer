@@ -3,6 +3,7 @@
 
 #include <stdint.h>
 #include <type_traits>
+#include <memory>
 
 #include <ringbuffer/c/ringbuffer.h>
 
@@ -47,6 +48,7 @@ public:
 
 private:
 
+   std::unique_ptr<uint8_t[]> _data;
    RingBuffer buffer;
    bool valid;
 };
