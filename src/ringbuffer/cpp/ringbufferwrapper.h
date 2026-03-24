@@ -49,7 +49,8 @@ public:
 private:
 
    std::unique_ptr<uint8_t[]> _data;
-   RingBuffer buffer;
+   // RingBuffer buffer;
+   std::unique_ptr<RingBuffer> _ring;
    bool valid;
 };
 
